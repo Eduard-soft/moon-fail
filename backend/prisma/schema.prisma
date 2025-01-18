@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URI")
+}
+
+model Post {
+  id      Int    @id @default(autoincrement())
+  title   String
+  content String
+
+  pictureUrl String @map("picture_url")
+
+  published Boolean @default(false)
+
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("posts")
+}
+
+model User {
+  id             Int     @id @default(autoincrement())
+  email          String  @unique
+  hashedPassword String? @map("hashed_password")
+  firstName      String? @map("first_name")
+  lastName       String? @map("last_name")
+  isBlocked      Boolean @default(false) @map("is_blocked")
+  avatarUrl      String  @map("avatar_url")
+
+  posts Post[]
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("users")
+}
